@@ -46,7 +46,7 @@ image = (
     modal.Image.debian_slim(python_version="3.13")
     .apt_install("git")
     .uv_pip_install(
-        "trainingpeaks-mcp@git+https://github.com/JamsusMaximus/trainingpeaks-mcp.git@06bdfe347759f458e577c59488455b6f52521b23"
+        "tp-mcp@git+https://github.com/JamsusMaximus/trainingpeaks-mcp.git@06bdfe347759f458e577c59488455b6f52521b23"
     )
     .uv_pip_install(
         "fastapi>=0.115",

@@ -9,8 +9,8 @@ dependencies = [
     "fastmcp>=2.14.0,<3",
     "mcp>=1.0.0",
     "modal>=1.4.2,<2",
-    "trainingpeaks-mcp",
+    "tp-mcp",
 ]
 
 [tool.uv.sources]
-trainingpeaks-mcp = { git = "https://github.com/JamsusMaximus/trainingpeaks-mcp.git", rev = "06bdfe347759f458e577c59488455b6f52521b23" }
+tp-mcp = { git = "https://github.com/JamsusMaximus/trainingpeaks-mcp.git", rev = "06bdfe347759f458e577c59488455b6f52521b23" }
