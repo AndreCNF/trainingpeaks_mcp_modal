@@ -1,0 +1,16 @@
+[project]
+name = "trainingpeaks-mcp-modal"
+version = "0.1.0"
+description = "TrainingPeaks MCP server hosted on Modal."
+readme = "README.md"
+requires-python = ">=3.13,<4"
+dependencies = [
+    "fastapi>=0.115",
+    "fastmcp>=2.14.0,<3",
+    "mcp>=1.0.0",
+    "modal>=1.4.2,<2",
+    "trainingpeaks-mcp",
+]
+
+[tool.uv.sources]
+trainingpeaks-mcp = { git = "https://github.com/JamsusMaximus/trainingpeaks-mcp.git", rev = "06bdfe347759f458e577c59488455b6f52521b23" }
