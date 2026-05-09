@@ -24,15 +24,16 @@ TrainingPeaks tokens are minted from a long-lived browser cookie
 ```bash
 # Generate one long random secret — this serves as both the MCP transport
 # bearer and the OAuth client_secret that Claude.ai's connector form expects.
-python3 -c "import secrets; print(secrets.token_urlsafe(32))"   # MCP_BEARER_TOKEN
+export MCP_BEARER_TOKEN="$(openssl rand -hex 32)"
+echo "MCP_BEARER_TOKEN=${MCP_BEARER_TOKEN}"
 
 # Grab the Production_tpAuth cookie from your browser:
 #   - Sign in to https://www.trainingpeaks.com
 #   - DevTools → Application → Cookies → trainingpeaks.com → Production_tpAuth
 #   - Copy the Value
 
-modal secret create tp-mcp-secrets \
-  MCP_BEARER_TOKEN=<paste-secret> \
+uv run modal secret create tp-mcp-secrets \
+  MCP_BEARER_TOKEN=${MCP_BEARER_TOKEN} \
   TP_AUTH_COOKIE=<paste-cookie>
 
 uv run python deploy.py   # Volume is auto-created by create_if_missing=True
@@ -136,9 +137,6 @@ modal run main.py::refresh_token_health
 - **Bearer auth at the ASGI layer.** A small wrapper around the MCP session
   manager checks `Authorization: Bearer ...` and returns 401 cleanly,
   without touching the session manager's lifespan.
-- **Pin upstream once it's green.** `pyproject.toml` currently points at
-  `main`; pin to a SHA after first successful deploy to insulate against
-  upstream renames of `_TOOL_HANDLERS`, `TOOLS`, or `get_credential`.
 
 ## Cookie expiry diagnostics
 
