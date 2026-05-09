@@ -234,18 +234,26 @@ def refresh_token_health():
 
     # Use upstream's auth validator — it exercises the full cookie → token
     # mint path and surfaces precise failure modes (expired cookie, network,
-    # API change). Falls back to validate_auth_sync for sync callers.
+    # API change). validate_auth_sync takes the cookie value directly.
     from tp_mcp.auth import validate_auth_sync  # noqa: PLC0415
 
-    result = validate_auth_sync()
+    cookie = read_cookie()
+    assert cookie  # guarded above
+    result = validate_auth_sync(cookie)
     print(f"[refresh_token_health] {result!r}")
 
 
 @app.function(volumes={VOLUME_PATH: cookie_volume})
-async def test_tool(tool_name: str = "tp_auth_status", arguments: dict | None = None):
+async def test_tool(tool_name: str = "tp_auth_status", arguments_json: str = ""):
     """Smoke-test the deployed MCP endpoint by calling one tool with the
     static bearer token. Useful after deploy to confirm the full stack works.
+
+    Pass tool arguments as a JSON string (Modal CLI can't parse `dict | None`):
+        modal run main.py::test_tool --tool-name tp_get_workouts \\
+            --arguments-json '{"start":"2026-01-01","end":"2026-01-07"}'
     """
+    import json  # noqa: PLC0415
+
     from fastmcp import Client  # noqa: PLC0415
     from fastmcp.client.transports import StreamableHttpTransport  # noqa: PLC0415
 
@@ -255,7 +263,7 @@ async def test_tool(tool_name: str = "tp_auth_status", arguments: dict | None = 
         headers={"Authorization": f"Bearer {bearer_token}"},
     )
     client = Client(transport)
-    args = arguments or {}
+    args = json.loads(arguments_json) if arguments_json else {}
     async with client:
         tools = await client.list_tools()
         names = [t.name for t in tools]

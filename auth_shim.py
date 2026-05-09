@@ -44,12 +44,25 @@ def install_cookie_shim() -> None:
     """Patch `tp_mcp.auth.storage.get_credential` (and its re-exports) before
     any other tp_mcp module captures a reference to it.
 
-    Returns the cookie regardless of the `key` argument — `tp_mcp` only stores
-    one credential, so disambiguating by key is unnecessary and brittle.
+    Upstream's `get_credential()` returns a `CredentialResult` dataclass
+    (`success`, `message`, `cookie`), not a raw string — the shim mirrors
+    that contract so callers like `tp_auth_status` keep working.
     """
+    from tp_mcp.auth.keyring import CredentialResult
 
-    def _shim_get_credential(_key: str = "") -> str | None:
-        return read_cookie()
+    def _shim_get_credential() -> CredentialResult:
+        cookie = read_cookie()
+        if cookie:
+            return CredentialResult(
+                success=True,
+                message="cookie loaded from modal volume/env",
+                cookie=cookie,
+            )
+        return CredentialResult(
+            success=False,
+            message="no cookie available — POST one to /refresh-cookie",
+            cookie=None,
+        )
 
     # Patch the actual definition site first.
     storage = importlib.import_module("tp_mcp.auth.storage")

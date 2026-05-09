@@ -109,10 +109,10 @@ curl -H "Authorization: Bearer $MCP_BEARER_TOKEN" \
   https://<modal-username>--trainingpeaks-mcp-endpoint.modal.run/mcp/
 
 # Smoke-test a single tool against the deployed server:
-modal run main.py::test_tool --tool-name tp_auth_status
+uv run modal run main.py::test_tool --tool-name tp_auth_status
 
 # Trigger the health-check cron manually:
-modal run main.py::refresh_token_health
+uv run modal run main.py::refresh_token_health
 ```
 
 ## File layout
